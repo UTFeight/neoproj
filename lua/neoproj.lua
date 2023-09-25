@@ -31,12 +31,11 @@ local function cd_project(project)
     dir_3f = _1_
     assert(dir_3f(path), (project .. " is not a directory"))
   end
-  -- if vim.loop.fs_access(session, "R") then
-  --   vim.cmd.source(session)
-  -- else
-  --   vim.cmd.edit(path)
-  -- end
-  vim.cmd([[Telescope file_browser]])
+  if vim.loop.fs_access(session, "R") then
+    vim.cmd.source(session)
+  else
+    vim.cmd.edit(path)
+  end
   vim.cmd.cd(path)
   vim.g.project_root = path
   return nil
