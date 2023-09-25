@@ -17,7 +17,7 @@ M.create_project = function(template, opts)
     vim.fn.system("cd " .. cache_dir .. " && git pull")
   end
 
-  return "cp -r " .. cache_dir .. " " .. "." -- Copy the cached project template to the current directory
+  return "cp -r " .. cache_dir .. "/*" .. " " .. "." -- Copy the cached project template to the current directory
 end
 
 local function cd_project(project)
