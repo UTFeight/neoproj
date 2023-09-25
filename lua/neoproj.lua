@@ -12,9 +12,11 @@ M.create_project = function(template, opts)
     vim.fn.system("git clone " .. url .. " " .. cache_dir)
   end
   -- If the project template is cached and pulling enabled, pull it
-  if opts.pull then
-    print("Pulling " .. url .. " to " .. cache_dir)
-    vim.fn.system("cd " .. cache_dir .. " && git pull")
+  if opts then
+    if opts.pull then
+      print("Pulling " .. url .. " to " .. cache_dir)
+      vim.fn.system("cd " .. cache_dir .. " && git pull")
+    end
   end
 
   return "cp -r " .. cache_dir .. "/*" .. " " .. "." -- Copy the cached project template to the current directory
