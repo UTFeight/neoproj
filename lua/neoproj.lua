@@ -63,7 +63,7 @@ local function expand_template(_7_)
     else
       local path = (_2aconfig_2a.project_path .. "/" .. _241)
       -- assert((1 == vim.fn.mkdir(path)), "Failed to create directory")
-      vim.cmd("!mkdir -p " .. path)
+      vim.cmd("silent !mkdir -p " .. path)
       vim.cmd.cd(path)
       vim.g.project_root = path
       do
@@ -108,7 +108,7 @@ local function save_session()
   local nvim_dir = (vim.g.project_root .. "/.nvim")
   if 0 == vim.fn.isdirectory(nvim_dir) then
     -- assert((1 == vim.fn.mkdir(nvim_dir)), "Failed to save session")
-    vim.cmd("!mkdir -p " .. nvim_dir)
+    vim.cmd("silent !mkdir -p " .. nvim_dir)
   else
   end
   return vim.cmd(("mksession! " .. nvim_dir .. "/session.vim"))
