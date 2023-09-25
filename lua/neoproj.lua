@@ -1,5 +1,25 @@
 local _2aconfig_2a = { project_path = (vim.env.HOME .. "/projects") }
 local _2atemplates_2a = {}
+
+local M = {}
+
+M.create_project = function(template, opts)
+  local url = "https://github.com/" .. template .. ".git"
+  local cache_dir = os.getenv("HOME") .. "/.cache/vimacs/projects/" .. template
+  -- If the project template is not cached, clone it
+  if vim.fn.empty(vim.fn.glob(cache_dir)) > 0 then
+    print("Cloning " .. url .. " to " .. cache_dir)
+    vim.fn.system("git clone " .. url .. " " .. cache_dir)
+  end
+  -- If the project template is cached and pulling enabled, pull it
+  if opts.pull then
+    print("Pulling " .. url .. " to " .. cache_dir)
+    vim.fn.system("cd " .. cache_dir .. " && git pull")
+  end
+
+  return "cp -r " .. cache_dir .. " " .. "." -- Copy the cached project template to the current directory
+end
+
 local function cd_project(project)
   local path = (_2aconfig_2a.project_path .. "/" .. project)
   local session = (path .. "/.nvim/session.vim")
@@ -20,7 +40,8 @@ local function cd_project(project)
   vim.g.project_root = path
   return nil
 end
-local function open_project(project)
+
+M.open_project = function(project)
   if ("" == project) or (nil == project) then
     local projects
     do
@@ -54,6 +75,7 @@ local function open_project(project)
     return cd_project(project)
   end
 end
+
 local function expand_template(_7_)
   local _arg_8_ = _7_
   local expand = _arg_8_["expand"]
@@ -63,7 +85,8 @@ local function expand_template(_7_)
     else
       local path = (_2aconfig_2a.project_path .. "/" .. _241)
       -- assert((1 == vim.fn.mkdir(path)), "Failed to create directory")
-      vim.cmd("silent !mkdir -p " .. path)
+      -- vim.cmd("silent !mkdir -p " .. path)
+      os.execute("mkdir -p " .. path)
       vim.cmd.cd(path)
       vim.g.project_root = path
       do
@@ -83,7 +106,8 @@ local function expand_template(_7_)
     _9_
   )
 end
-local function new_project()
+
+M.new_project = function()
   local function _13_(_241)
     return _241.name
   end
@@ -100,7 +124,8 @@ local function new_project()
     format_item = _13_,
   }, _14_)
 end
-local function save_session()
+
+M.save_session = function()
   assert(
     (("string" == type(vim.g.project_root)) and ("" ~= vim.g.project_root)),
     "Not in project"
@@ -108,17 +133,20 @@ local function save_session()
   local nvim_dir = (vim.g.project_root .. "/.nvim")
   if 0 == vim.fn.isdirectory(nvim_dir) then
     -- assert((1 == vim.fn.mkdir(nvim_dir)), "Failed to save session")
-    vim.cmd("silent !mkdir -p " .. nvim_dir)
+    -- vim.cmd("silent !mkdir -p " .. nvim_dir)
+    os.execute("mkdir -p " .. path)
   else
   end
   return vim.cmd(("mksession! " .. nvim_dir .. "/session.vim"))
 end
-local function setup(config)
+
+M.setup = function(config)
   assert(("table" == type(config)), "config: expected table")
   _2aconfig_2a = vim.tbl_deep_extend("force", _2aconfig_2a, config)
   return nil
 end
-local function register_template(template)
+
+M.register_template = function(template)
   assert(("string" == type(template.name)), "name: expected string")
   do
     local t = type(template.expand)
@@ -129,10 +157,13 @@ local function register_template(template)
   end
   return table.insert(_2atemplates_2a, template)
 end
-return {
-  open_project = open_project,
-  new_project = new_project,
-  setup = setup,
-  register_template = register_template,
-  save_session = save_session,
-}
+
+return M
+
+-- return {
+--   open_project = open_project,
+--   new_project = new_project,
+--   setup = setup,
+--   register_template = register_template,
+--   save_session = save_session,
+-- }
